@@ -5,8 +5,9 @@
 
 function displayhelp {
   cat << EOF
-  Usage: $0 [-h | --help] [output option...]
-    output option can be one or more of the following:
+  Usage: $0 [-h | --help] [output option, ...]
+
+  Output options can be one or more of the following:
     -n | --nameinfo
     -i | --ipinfo
     -o | --osinfo
