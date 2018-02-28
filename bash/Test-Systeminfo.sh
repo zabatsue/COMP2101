@@ -1,8 +1,9 @@
 #!/bin/bash
 #This script implements tasks for the bash semester assignment
+#This is my first script please be gentle :)
 
 #Define functions for error messages and display command line help
-
+#Displays the Help Tab if the USER inputs an incorrect command or types -h | -help
 function displayhelp {
   cat << EOF
   Usage: $0 [-h | --help] [output option, ...]
@@ -19,11 +20,15 @@ function displayhelp {
 EOF
 }
 
+#Function for Calling the Error Message subscript up
 function errormessage {
   echo "$@" >&2
 }
 
 #Process the command line options, saving the variable for later use
+#runindefault=yes allows the Script to Run All functions at once if the user does not specify a specific parameter for an output option
+
+#THIS IS THE MAIN WHILE LOOP
 runindefault="yes"
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -72,7 +77,10 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-#Gathering data into variables
+#This is the IF Statements that Check the Option the User wanted to Print. When the Command is Selected:
+#(eg. -n), then the Script will Check if the $nameinfowanted variable is a YES, triggering the secondary IF check later on in the script/
+#This is also the place where the commands to check hostname, memory free, etc. are run. When the commands are TRUE then the output variable
+#gets the command writen to it
 
 if [ "$runindefault" = "yes" -o "$nameinfowanted" = "yes" ]; then
   nameinfo="$(hostname && domainname)"
@@ -105,7 +113,9 @@ fi
 if [ "$runindefault" = "yes" -o "$softinfowanted" = "yes" ]; then
   softinfo="$(dpkg --get-selections)"
 fi
-#Create the output using the gathered data and command line options
+
+#This is where we create the output using the gathered command line options and data and is fed back to the USER as an output in the Terminal
+#Here the Spaces between the info output and the variables are actually followed through to the Terminal, making it clearer for the user to read
 
 nameinfooutput="System Name and Domain name (If Applicable):
 
@@ -151,7 +161,8 @@ $softinfo
 
 -----------------------------"
 
-#Display the output
+#This is the part of the script where it checks if the infowanted is TRUE and will Display the output to the terminal. If the user selects
+# a specific input/output command than it will "= YES" prompting the script to echo the information previously filled in
 if [ "$runindefault" = "yes" -o "$nameinfowanted" = "yes" ]; then
   echo "$nameinfooutput"
 fi
@@ -183,4 +194,5 @@ fi
 if [ "$runindefault" = "yes" -o "$softinfowanted" = "yes" ]; then
   echo "$softinfooutput"
 fi
+
 #do any cleanup of temporary files if needed
