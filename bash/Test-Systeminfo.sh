@@ -7,7 +7,7 @@ function displayhelp {
   cat << EOF
   Usage: $0 [-h | --help] [output option...]
     output option can be one or more of the following:
-    -n | --namesinfo
+    -n | --nameinfo
     -i | --ipinfo
     -o | --osinfo
     -c | --cpuinfo
@@ -23,7 +23,7 @@ function errormessage {
 }
 
 #Process the command line options, saving the variable for later use
-rundefault="yes"
+runindefault="yes"
 while [ $# -gt 0 ]; do
   case "$1" in
     -h|--help)
@@ -31,39 +31,39 @@ while [ $# -gt 0 ]; do
       exit 0
       ;;
     -n|--namesinfo)
-      namesinfowanted="yes"
-      rundefault="no"
+      nameinfowanted="yes"
+      runindefault="no"
       ;;
     -i|--ipaddress)
       ipinfowanted="yes"
-      rundefault="no"
+      runindefault="no"
       ;;
     -o|--osinfo)
       osinfowanted="yes"
-      rundefault="no"
+      runindefault="no"
       ;;
     -c|--cpuinfo)
       cpuinfowanted="yes"
-      rundefault="no"
+      runindefault="no"
       ;;
     -m|--memory)
       meminfowanted="yes"
-      rundefault="no"
+      runindefault="no"
       ;;
     -d|--diskinfo)
       diskinfowanted="yes"
-      rundefault="no"
+      runindefault="no"
       ;;
     -p|--printinfo)
       printinfowanted="yes"
-      rundefault="no"
+      runindefault="no"
       ;;
     -s|--softinfo)
       softinfowanted="yes"
-      rundefault="no"
+      runindefault="no"
       ;;
     *)
-      errormessage "I don't recognize '$1'"
+      errormessage "Sorry I don't recognize the command '$1'"
       errormessage "$(displayhelp)"
       exit 1
       ;;
@@ -71,104 +71,115 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-#Gather the data into variables, using arrays where helpful
+#Gathering data into variables
 
-if [ "$rundefault" = "yes" -o "$namesinfowanted" = "yes" ]; then
-  namesinfo="$(hostname && domainname)"
+if [ "$runindefault" = "yes" -o "$nameinfowanted" = "yes" ]; then
+  nameinfo="$(hostname && domainname)"
 fi
 
-if [ "$rundefault" = "yes" -o "$ipinfowanted" = "yes" ]; then
+if [ "$runindefault" = "yes" -o "$ipinfowanted" = "yes" ]; then
   ipinfo="$(ip -o address | grep "ens33" | sed -n '1p' | awk '{print $4;}')"
 fi
 
-if [ "$rundefault" = "yes" -o "$osinfowanted" = "yes" ]; then
+if [ "$runindefault" = "yes" -o "$osinfowanted" = "yes" ]; then
   osinfo="$(grep PRETTY /etc/os-release | sed -e 's/.*=//' -e 's/\"//g')"
 fi
 
-if [ "$rundefault" = "yes" -o "$cpuinfowanted" = "yes" ]; then
+if [ "$runindefault" = "yes" -o "$cpuinfowanted" = "yes" ]; then
   cpuinfo="$(lscpu | grep 'Model name' | sed -e 's/.*://' -e 's/^[ \t]*//')"
 fi
 
-if [ "$rundefault" = "yes" -o "$meminfowanted" = "yes" ]; then
+if [ "$runindefault" = "yes" -o "$meminfowanted" = "yes" ]; then
   meminfo="$(free -m | head -2)"
 fi
 
-if [ "$rundefault" = "yes" -o "$diskinfowanted" = "yes" ]; then
+if [ "$runindefault" = "yes" -o "$diskinfowanted" = "yes" ]; then
   diskinfo="$(df -h / | awk '{print $2,$3,$4;}')"
 fi
 
-if [ "$rundefault" = "yes" -o "$printinfowanted" = "yes" ]; then
+if [ "$runindefault" = "yes" -o "$printinfowanted" = "yes" ]; then
   printinfo="$(lpstat -p)"
 fi
 
-if [ "$rundefault" = "yes" -o "$softinfowanted" = "yes" ]; then
+if [ "$runindefault" = "yes" -o "$softinfowanted" = "yes" ]; then
   softinfo="$(dpkg --get-selections)"
 fi
 #Create the output using the gathered data and command line options
 
-namesinfooutput="System and Domain name:
------------------------------
-$namesinfo
+nameinfooutput="System Name and Domain name (If Applicable):
+
+$nameinfo
+
 -----------------------------"
+
 ipinfooutput="IP Address:
------------------------------
+
 $ipinfo
+
 -----------------------------"
 osinfooutput="Operating System Information:
------------------------------
+
 $osinfo
+
 -----------------------------"
 cpuinfooutput="CPU model:
------------------------------
+
 $cpuinfo
+
 -----------------------------"
+
 meminfooutput="Memory info:
------------------------------
+
 $meminfo
+
 -----------------------------"
 diskinfooutput="Disk Space:
------------------------------
+
 $diskinfo
+
 -----------------------------"
 printinfooutput="Printer information:
------------------------------
+
 $printinfo
+
 -----------------------------"
+
 softinfooutput="Software Installed:
------------------------------
+
 $softinfo
+
 -----------------------------"
 
 #Display the output
-if [ "$rundefault" = "yes" -o "$namesinfowanted" = "yes" ]; then
-  echo "$namesinfooutput"
+if [ "$runindefault" = "yes" -o "$nameinfowanted" = "yes" ]; then
+  echo "$nameinfooutput"
 fi
 
-if [ "$rundefault" = "yes" -o "$ipinfowanted" = "yes" ]; then
+if [ "$runindefault" = "yes" -o "$ipinfowanted" = "yes" ]; then
   echo "$ipinfooutput"
 fi
 
-if [ "$rundefault" = "yes" -o "$osinfowanted" = "yes" ]; then
+if [ "$runindefault" = "yes" -o "$osinfowanted" = "yes" ]; then
   echo "$osinfooutput"
 fi
 
-if [ "$rundefault" = "yes" -o "$cpuinfowanted" = "yes" ]; then
+if [ "$runindefault" = "yes" -o "$cpuinfowanted" = "yes" ]; then
   echo "$cpuinfooutput"
 fi
 
-if [ "$rundefault" = "yes" -o "$meminfowanted" = "yes" ]; then
+if [ "$runindefault" = "yes" -o "$meminfowanted" = "yes" ]; then
   echo "$meminfooutput"
 fi
 
-if [ "$rundefault" = "yes" -o "$diskinfowanted" = "yes" ]; then
+if [ "$runindefault" = "yes" -o "$diskinfowanted" = "yes" ]; then
   echo "$diskinfooutput"
 fi
 
-if [ "$rundefault" = "yes" -o "$printinfowanted" = "yes" ]; then
+if [ "$runindefault" = "yes" -o "$printinfowanted" = "yes" ]; then
   echo "$printinfooutput"
 fi
 
-if [ "$rundefault" = "yes" -o "$softinfowanted" = "yes" ]; then
+if [ "$runindefault" = "yes" -o "$softinfowanted" = "yes" ]; then
   echo "$softinfooutput"
 fi
 #do any cleanup of temporary files if needed
