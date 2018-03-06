@@ -1,4 +1,5 @@
 #!/bin/bash
+#Graham Brown 200333656 March 5th 2018
 #This script implements tasks for the bash semester assignment
 #This is my first script please be gentle :)
 
